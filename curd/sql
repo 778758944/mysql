@@ -1,0 +1,97 @@
+select *
+from orders
+where customerid=3;
+-- 选择customerid为3的记录
+
+-- //一个表的查询
+select orders.orderid,orders.amount,orders.date
+from customers, orders
+where name="Julie Smith"
+and customers.customerid=orders.customerid;
+
+-- 多表关联查询
+select customers.name
+from customers, orders, order_items, books
+where customers.customerid=orders.customerid
+and orders.orderid=order_items.orderid
+and order_items.isbn=books.isbn
+and books.title like "%Java%";
+
+-- 做关联，以左边的为基础，匹配右边的
+select customers.customerid, customers.name, orders.orderid
+from customers left join orders
+using(customerid)
+-- on customers.customerid=orders.customerid
+-- 只查询没有订购过的人
+where orders.orderid is null;
+
+
+-- as语句可以用来设置表格的别名
+select c.name
+from customers as c, orders as o, order_items as oi, books as b
+where c.customerid=o.customerid
+and o.orderid=oi.orderid
+and oi.isbn=b.isbn
+and b.title like "%java%";
+
+-- order by 按顺序查询
+select name, address
+from customers
+order by name;
+
+select name ,address
+from customers
+-- 以降序排列
+order by name desc;
+
+
+-- 求一列的均值
+select avg(amount)
+from orders;
+
+select max(amount)
+from orders;
+
+-- group by表示分组求平均值
+select customerid,avg(amount)
+from orders
+group by customerid;
+
+-- 只显示平均值大于50 的
+select customerid, avg(amount)
+from orders
+group by customerid
+having avg(amount)>50;
+
+select name
+from customers
+-- limit 表示从第0行开始，返回1行；
+limit 0,1;
+
+select customerid, amount
+from orders
+where amount=(select max(amount) from orders);
+
+select isbn,title
+from books
+where not exists
+(select * from order_items where order_items.isbn=books.isbn);
+
+-- 更新数据库数据
+update books
+	set price=price*1.1;
+
+update customers
+	set address="kk.kk.kk"
+	where customerid=2;
+
+-- 修改表格
+alter table orders
+add tax float(6,2) after amount;
+
+alter table orders
+drop tax;
+
+--删除行
+delete from customers
+	where customerid=5;

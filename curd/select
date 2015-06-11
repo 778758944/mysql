@@ -1,0 +1,3 @@
+use books;
+select name,city
+from customers;
