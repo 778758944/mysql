@@ -224,46 +224,275 @@ as tmp group by cat_id;
 #category查有商品的栏目
 select cat_id,cat_name from category where exists (select * from goods where goods.cat_id=category.cat_id);
 
+#union 合并插叙结果 列数一致  以第一次列名为列名   重复的自动去掉
+select goods_name,shop_price from goods
+where shop_price>5000
+union
+select goods_name,shop_price from goods
+where shop_price<20;
+
+#如果字句中有order by 加括号
+ (select goods_name,shop_price,cat_id from goods
+ where cat_id=4 order by shop_price)
+ union
+ (select goods_name,shop_price,cat_id from goods
+ where cat_id=5 order by shop_price);
+#在子句中排序 
+ select goods_name,shop_price,cat_id from goods
+ where cat_id=4
+ union
+ select goods_name,shop_price,cat_id from goods
+ where cat_id=5 order by shop_price desc;
+#limit让排训有效
+(select goods_name,shop_price,cat_id from goods where cat_id=3
+order by shop_price desc limit 0,3)
+union
+(select goods_name,shop_price,cat_id from goods where cat_id=4
+order by shop_price desc limit 0,2);
+
+#接表 连接条件
+#左连接
+select
+goods_name,goods_id,goods.cat_id,cat_name,shop_price from
+goods left join category
+on goods.cat_id=category.cat_id;#连接条件
+#以左表为基准，没找到用null补气
+
+
+#右连接
+select boy.*,girl.* from
+girl right join boy
+on girl.flower=boy.flower;
+
+
+#内连接 查询左右表都有的数据 不要左右连接中null的部分
+select boy.*,girl.* from
+boy inner join girl
+on boy.flower=girl.flower;
+
+select 
+* from
+goods right join category
+
+
+select
+* from 
+goods inner join
+
+
+create table boy(
+	name char(10),
+	flower char(10)
+);
+
+create table girl(
+	name char(10),
+	flower char(10)
+);
+
+insert into boy
+	values
+	("Jack","rose"),
+	("Kaka","taohua"),
+	("Jay","moli"),
+	("Messi","hehua"),
+	("Zedani","gou");
+
+insert into girl
+	values
+	("Lucy","rose"),
+	("Juli","taohua"),
+	("Kassy","moli"),
+	("Flora","moli"),
+	("Nacy","hehua");
+select boy.*,girl.* from
+boy left join girl
+on
+boy.flower=girl.flower;
+
+25
 
 
 
 
 
 
+a 5
+b 15
+c 25
+d 30
+e 90
+
+
+#增加列
+Alter table 表名字 列声明
+
+Alter table boy add height tinyint unsigned not
+null default 0;
+#增加咧在表最后
+#after可以声明新增列在哪列后面
+
+Alter table boy add age tinyint unsigned not null default 32
+after flower;
+
+#加到第一列
+Alter table boy add id int primary key auto_increment
+first
+
+#修改列
+Alter table 表 change 被改变的列明 新的列声明
+
+Alter table boy change height height smallint not null default 180
+
+#删除咧
+Alter table 表 drop  列
+Alter table boy drop id;
+
+#视图
+#由查询结果组成的一张虚拟表
+select goods_id,goods_name,cat_id,shop_price from
+goods where shop_price>1000;
+
+create view name as select
+create view pp as select goods_id,goods_name,cat_id,shop_price from
+goods where shop_price>1000;
+
+#试图删除
+drop view
+
+#试图权限控制
+# 试图修改
+#表的数据的改变会影响试图的改变 
+#试图不是总能改
+#试图的改变会影响表
+#试图比训包含表中没有默认值的列
+
+#试图的algonpthm
+Alter view 
+
+
+Merge:当引用试图时，引用试图的语句与定义语句合并
+
+Temltable:建立零时表
+create algorithm=Temptable view g3  as select goods_id,goods_name,cat_id,shop_price from goods
+order by cat_id asc,shop_price desc;
+
+undefined:自动
+
+客户端－－－转换器－－－服务器
+客户端发送数据使用的字符集 set character_set_client=gbk/utf8
+转换器转化的字符集 set character_set_connection=gbk/utf8
+返回给客户端的字符集 set character_set_results=gbk/utf8
+
+#触发器
+#监视三种操作 增删改
+#触发操作  增删改
+#监视地点  监视时间 触发事件  触发事件
+create trigger triggerName
+	after/before insert/update/delete on tablename
+	begin
+	sql
+	end;
+
+create trigger tg1 after
+insert on o 
+for each row
+begin
+update g set num=num-3 where id=2;
+end$
+#改变终止符号
+delimiter $
+
+#获取新增行
+#用new表示新行
 
 
 
+#删除触发器的语法
+drop trigger trigger tg1
+
+create trigger tg2
+	after insert on o
+	for each row
+	begin
+	update g set num=num-new.much where id=new.gid;
+	end$
+
+create trigger tg3
+	after delete on o
+	for each row
+	begin
+	update g set num=num+old.much where id=old.gid;
+	end$
+
+create trigger tg4
+	after update on o
+	for each row
+	begin
+	update g set num=num+old.much-new.much where id=new.gid; 
+	end$
 
 
+create trigger tg5 
+	before insert on o
+	for each row
+	begin
+	if new.much>5 then 
+	set new.much=5; 
+	end if;
+    update g set num=num-new.much where id=new.gid;
+	end$
 
 
+#存储引擎
+myisam 批量插入熟读快  不支持事务，锁表
+ innoDB 批量插入速度慢  支持事务 锁行 支持全文索引
 
 
+create table account(
+	id int,
+	name varchar(10),
+	money int
+)engine=innodb;
 
 
+#开启事务
+start transaction;
+
+#事务完毕
+commit or rollback
+
+#导出表
+mysqldump -uroot -proot database  table > ''
+mysqldump -uroot -proot database -B mugua>
+
+#还原数据库
+#恢复以库为单位
+source Documents/dumo/ks.sql;
+#表恢复
+#在库状态下执行上述语句
+#不登入mysql
+#库
+mysql -uroot -proot < Documents/dump/ks.sql;
+#表
+mysql -uroot -proot ks< Documents/dump/fenshu.sql;
 
 
+#普通索引 加快查询速度
+#唯一索引 行上的值不能重复
+#主键索引 主键不能重复
+#全文索引
+#查看一张表格的索引
+show index from biao;
 
+#建立索引
+alter table biao add index/unique/primarykey/fulltext index(column)
 
+#删除索引
+alter table drop index 索引名
+#全文索引的用法
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+match (index) against (keyword);
 
 
 
